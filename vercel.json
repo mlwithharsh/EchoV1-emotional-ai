@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "zen_flask/app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "zen_flask/app.py"
+    }
+  ],
+  "env": {
+    "FLASK_ENV": "production",
+    "BACKEND_API_URL": "https://your-railway-backend-url.railway.app"
+  }
+}
