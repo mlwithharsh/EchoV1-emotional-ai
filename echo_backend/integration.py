@@ -74,6 +74,17 @@ def pipeline(audio_file_path: str) -> dict:
         }
     
     try:
+        # Validate audio file exists
+        if not os.path.exists(audio_file_path):
+            return {
+                "error": "Audio file not found",
+                "transcribed_text": "",
+                "intent": "unknown",
+                "emotion": "neutral",
+                "sentiment": "neutral",
+                "response_text": "Audio file not found."
+            }
+        
         # Transcribe audio
         if stt is None:
             raise Exception("Speech-to-Text component not available")
