@@ -7,9 +7,12 @@ import time
 from functools import lru_cache
 import requests
 import logging
-from dotenv import load_dotenv
-
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # dotenv not available, continue without it
+    pass
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 
@@ -45,31 +48,42 @@ class NLPEngine:
                 
                 if not response.content:
                     self.logger.warning(f"[Attempt {attempt+1}] Empty response from model.")
-                    time.sleep(3)
+                    if attempt < 2:  # Don't sleep on last attempt
+                        time.sleep(3)
                     continue
 
                 if response.status_code == 429:  # Rate limit
                     self.logger.warning(f"[Attempt {attempt+1}] Rate limit hit, waiting...")
-                    time.sleep(5)
+                    if attempt < 2:  # Don't sleep on last attempt
+                        time.sleep(5)
                     continue
 
                 if response.status_code != 200:
                     self.logger.warning(f"[Attempt {attempt+1}] HTTP {response.status_code}: {response.text}")
-                    time.sleep(3)
+                    if attempt < 2:  # Don't sleep on last attempt
+                        time.sleep(3)
                     continue
 
                 try:
                     result = response.json()
-                    return result["choices"][0]["message"]["content"].strip()
+                    if "choices" in result and len(result["choices"]) > 0:
+                        return result["choices"][0]["message"]["content"].strip()
+                    else:
+                        self.logger.warning(f"[Attempt {attempt+1}] Invalid response structure: {result}")
+                        if attempt < 2:
+                            time.sleep(3)
+                        continue
                 
                 except Exception as e:
                     self.logger.error(f"[Attempt {attempt+1}] JSON parsing error: {e}")
-                    time.sleep(3)
+                    if attempt < 2:
+                        time.sleep(3)
                     continue
 
             except Exception as e:
                 self.logger.error(f"[Attempt {attempt+1}] Request Error: {e}")
-                time.sleep(3)
+                if attempt < 2:
+                    time.sleep(3)
 
         return "[Groq Error]: Failed after 3 attempts"
 
