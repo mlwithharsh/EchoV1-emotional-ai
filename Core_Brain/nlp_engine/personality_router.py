@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'echo_backend'))
+
 from echo_backend.personalities.Suzi import Suzi
 from echo_backend.personalities.EchoPersonality import EchoPersonality
 
