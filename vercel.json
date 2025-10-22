@@ -11,8 +11,5 @@
       "src": "/(.*)",
       "dest": "App/app-vercel.py"
     }
-  ],
-  "env": {
-    "GROQ_API_KEY": "@groq_api_key"
-  }
+  ]
 }
