@@ -1,5 +1,5 @@
 class BasePersonality:
-    def __init__(self, name , goals, style):
+    def __init__(self, name, style, goals):
         self.name = name
         self.style = style
         self.goals = goals
