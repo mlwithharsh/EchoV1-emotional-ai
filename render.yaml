@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: EchoV1
+    env: python
+    plan: free  # or starter/pro depending on your needs
+    buildCommand: |
+      pip install --upgrade pip setuptools wheel
+      apt-get update && apt-get install -y ffmpeg
+      pip install -r requirements.txt
+    startCommand: streamlit run Core_Brain/app.py --server.port $PORT
+    pythonVersion: 3.11
+    autoDeploy: true
+    envVars:
+      - key: OPENAI_API_KEY
+        fromSecret: OPENAI_API_KEY
