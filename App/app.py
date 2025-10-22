@@ -34,8 +34,6 @@ try:
     )
 
     from Core_Brain.nlp_engine import NLPEngine
-
-    nlp = NLPEngine()
     
     components = {
         'stt': stt,
@@ -65,10 +63,13 @@ except ImportError as e:
         'is_core_ready': lambda: False
     }
 
-router = PersonalityRouter()
+# Initialize router and session state
 if "selected_personality" not in st.session_state:
     st.session_state.selected_personality = "echo"  # default
-    router.set_personality("echo")
+
+router = PersonalityRouter()
+if BACKEND_AVAILABLE:
+    router.set_personality(st.session_state.selected_personality)
 
 # Extract components
 stt = components['stt']
@@ -304,12 +305,14 @@ with col1:
             # Audio response
             if result.get('response_audio_path') and os.path.exists(result['response_audio_path']):
                 st.audio(result['response_audio_path'], format="audio/mp3")
-                # Clean up
+                # Clean up response audio file
                 try:
                     time.sleep(1)
-                    os.remove(result['response_audio_path'])
-                except:
-                    pass
+                    if os.path.exists(result['response_audio_path']):
+                        os.remove(result['response_audio_path'])
+                        logger.info(f"Cleaned up response audio file: {result['response_audio_path']}")
+                except Exception as response_cleanup_error:
+                    logger.warning(f"Failed to clean up response audio file {result['response_audio_path']}: {response_cleanup_error}")
 
             # Save to history
             st.session_state.conversation_history.append({
@@ -323,10 +326,24 @@ with col1:
 
             # Clean up audio file
             try:
-                if os.path.exists(audio_path):
+                if audio_path and os.path.exists(audio_path):
                     os.remove(audio_path)
-            except:
-                pass
+                    logger.info(f"Cleaned up audio file: {audio_path}")
+            except Exception as cleanup_error:
+                logger.warning(f"Failed to clean up audio file {audio_path}: {cleanup_error}")
+                # Try to clean up in background if immediate cleanup fails
+                try:
+                    import threading
+                    def delayed_cleanup():
+                        time.sleep(5)  # Wait 5 seconds
+                        try:
+                            if os.path.exists(audio_path):
+                                os.remove(audio_path)
+                        except:
+                            pass
+                    threading.Thread(target=delayed_cleanup, daemon=True).start()
+                except:
+                    pass
 
 with col2:
     st.subheader("✍️ Or Type Instead")
