@@ -1,12 +1,1 @@
-streamlit==1.47.1
-streamlit-lottie==0.0.5
-requests==2.32.4
-numpy==1.26.4
-openai-whisper==20231117
-groq==0.4.1
-pydub==0.25.1
-gtts==2.4.0
-cryptography==41.0.7
-python-dotenv==1.0.0
-sounddevice==0.4.6
-soundfile==0.12.1
+flask==3.0.0
