@@ -1,0 +1,12 @@
+# Environment
+.env
+*.pyc
+__pycache__/
+
+# Audio Files
+*.mp3
+*.wav
+
+# Streamlit Cache
+.streamlit/
+.cache/

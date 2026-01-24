@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: EchoV1
+    env: python
+    plan: starter  # Recommended for AI workloads
+    buildCommand: |
+      pip install --upgrade pip setuptools wheel
+      apt-get update && apt-get install -y ffmpeg portaudio19-dev
+      pip install -r requirements.txt
+    startCommand: streamlit run App/app.py --server.port $PORT --server.address 0.0.0.0
+    pythonVersion: 3.11
+    autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      - key: GROQ_API_KEY
+        fromSecret: GROQ_API_KEY
+      - key: STREAMLIT_SERVER_HEADLESS
+        value: true
+      - key: STREAMLIT_SERVER_ENABLE_CORS
+        value: false
